@@ -23,12 +23,13 @@ class liveFeedHub {
 		//	return;
 		//}
 
-		const hubEndpoint = 'http://localhost:52202/signalr';
+		// const hubEndpoint = 'http://localhost:52202/signalr';
+		const hubEndpoint = 'http://localhost:2558/signalr';
 		const connection = $.hubConnection(hubEndpoint, {
 			useDefaultPath: false
 		//	qs: `Bearer=${token}`
 		});
-		const proxy = connection.createHubProxy('liveFeedHub');
+		const proxy = connection.createHubProxy('chatHub');
 
 		connection.connectionSlow(() =>
 			console.log('Currently experiencing difficulties with the connection to LiveFeed hub!')
@@ -45,7 +46,7 @@ class liveFeedHub {
 
 		// receives broadcast messages from a hub function, called "onBroadcastGroup"
 		proxy.on('onBroadcastGroup', (payload) => this.onLiveFeedUpdated && this.onLiveFeedUpdated(payload));
-
+		proxy.on('broadCastMessage',(name,msg)=>console.log('name:'+name+' msg:'+msg))
 		this.connection = connection;
 		this.proxy = proxy;
 		this.tryConnect();
@@ -58,7 +59,7 @@ class liveFeedHub {
 			.done(() => {
 				console.log(`LiveFeed hub connected, Connection Id: ${_this.connection.id}`);
 
-				_this.proxy = this.connection.createHubProxy('liveFeedHub');
+				_this.proxy = this.connection.createHubProxy('chatHub');
 				_this.connectionId = _this.connection.id;
 				if (this.lastGroupIdJoined) {
 					console.log(`Re-joining to Group Id ${this.lastGroupIdJoined} after disconnect!`);
@@ -92,6 +93,7 @@ class liveFeedHub {
 			this.lastGroupIdJoined = null;
 			console.log(`Left Group Id: ${groupId}`);
 		}
+		
 	}
 
 	broadcastGroup(groupId, payload) {
@@ -99,6 +101,15 @@ class liveFeedHub {
 		if (this.connectionId) {
 			this.proxy.invoke('broadcastGroup', groupId, payload);
 			console.log('Broadcasted!');
+		}
+		this.sendMsg('tt','hi');
+	}
+
+	sendMsg(name,msg){
+		console.log('sendMsg');
+		if(this.connectionId){
+			this.proxy.invoke('SendMessage',name,msg);
+			console.log('sendmsg');
 		}
 	}
 }
