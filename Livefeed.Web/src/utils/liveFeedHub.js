@@ -25,6 +25,7 @@ class liveFeedHub {
 
 		// const hubEndpoint = 'http://localhost:52202/signalr';
 		const hubEndpoint = 'http://localhost:2558/signalr';
+		// const hubEndpoint = 'http://localhost:52842/signalr';
 		const connection = $.hubConnection(hubEndpoint, {
 			useDefaultPath: false
 		//	qs: `Bearer=${token}`
